@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset='UTF-8'>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap-grid.min.css" rel="stylesheet">
+		<script src="https://cdn.bootcss.com/js-sha256/0.9.0/sha256.min.js"></script>
+		<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+		<script src="/js/notify.min.js"></script>
+		<title>匿名提问箱</title>
+		<style>
+@keyframes downn {
+	0% {
+		transform: translate(0px, 0px);
+	}
+	50% {
+		transform: translate(0px, 7px);
+	}
+	100% {
+		transform: translate(0px, 0px);
+	}
+}
+		</style>
+	</head>
+
+	<body style="background-color: #001a37;color:#e8e8e8">
+		<div class="container" style="max-width:900px;" >
+
+
+			<div style="text-align:center; margin: 25px 0">
+				<img align='center' src='/img/logo-text.svg' width=96px/>
+				<h1 align='center'>匿名提问箱</h1>
+				<hr/>
+
+				<p>提问无需登陆，真正匿名<br/>
+				链接路径加密，避免乱入</p>
+
+			</div>
+
+			<hr style="border-top: 1px solid white;"/>
+
+			<div style="text-align:center; margin:1%">
+
+				<p><a type="button" class="btn btn-primary btn-lg" href="/askMe#start">创建提问箱</a></p>
+				<svg viewbox="0 0 50 100" width="64px" height="64px" stroke="#e8e8e8" stroke-width="7.5" stroke-miterlimit="10" style="animation: downn 2s infinite;"><path d="M25.684 10v50.4"/><path d="M40.284 45.4L24.684 61"/><path d="M10.884 45.4l15.6 15.6"/></svg>
+				<p>分享加密链接</p>
+				<svg viewbox="0 0 50 100" width="64px" height="64px" stroke="#e8e8e8" stroke-width="7.5" stroke-miterlimit="10" style="animation: downn 3s infinite;"><path d="M25.684 10v50.4"/><path d="M40.284 45.4L24.684 61"/><path d="M10.884 45.4l15.6 15.6"/></svg>
+				<p>好友匿名提问</p>
+				<svg viewbox="0 0 50 100" width="64px" height="64px" stroke="#e8e8e8" stroke-width="7.5" stroke-miterlimit="10" style="animation: downn 4s infinite;"><path d="M25.684 10v50.4"/><path d="M40.284 45.4L24.684 61"/><path d="M10.884 45.4l15.6 15.6"/></svg>
+				<p>bot在闭社私信提醒</p>
+				<svg viewbox="0 0 50 100" width="64px" height="64px" stroke="#e8e8e8" stroke-width="7.5" stroke-miterlimit="10" style="animation: downn 5s infinite;"><path d="M25.684 10v50.4"/><path d="M40.284 45.4L24.684 61"/><path d="M10.884 45.4l15.6 15.6"/></svg>
+				<p>回复私信进行答复或删除</p>
+			</div>
+
+
+			<hr style="border-top: 1px solid white;"/>
+
+			<div id="start" style="margin:30px auto;padding:15px;border: 1px dashed white;border-radius:15px; max-width:450px;">
+				<p>输入闭社id并私信 <b>@ask_me_bot</b> “新建”或“重置”，然后点击按钮，即可新建提问箱或重置提问箱链接。</p>
+				<form class="form-inline" action="javascript:void(0);" onsubmit="return sendData()">
+					<div class="input-group mb-2 mr-sm-2">
+						<div class="input-group-prepend">
+							<div class="input-group-text">@</div>
+						</div>
+						<input type="text" class="form-control" id="username" placeholder="Username">
+					</div>
+					<button id="send" type="submit" class="btn btn-primary mb-2">我已私信</button>
+				</form>
+				<p style="font-size:80%"> <br/>
+				* 可通过重置链接并不再分享新链接来实现关闭提问箱。 <br/>
+				** 非清华站用户请使用完整用户名而非本地用户名，例如 @somebody@tha.closed.social。<br/>
+				** 高级用法：私信“重置[路径]”以指定加密路径，而非默认的随机路径。限长度不超过32的小写字母，示例：<br/>“@ask_me_bot 重置[hhhhhhh]”。
+				</p>
+			</div>
+
+			<hr/>
+
+		</div>
+
+		<script type="text/javascript">
+$.notify.defaults({autoHideDelay: 1500});
+function test() {alert('test');}
+
+
+function sendData() {
+	$('#send')[0].disabled = true;
+	var data = {
+		username: $('#username')[0].value
+	};
+	$.ajax({
+		type:'POST',
+		url:'inbox/',
+		data:data, 
+		success:(result,status,xhr) => {
+			console.log(result+' : '+status);
+			$.notify("操作成功", "success");
+		},
+		error:(xhr,status,error) => {
+			$.notify(xhr.status+' : '+xhr.responseText, "error");
+			$('#send')[0].disabled = false;
+		}
+	});
+	return false;
+}
+
+		</script>
+
+		<footer style="background-color:#000010;color:white;border-top: 1px solid white;margin-top:20px;padding-top:10px;">
+			<div class="footer" id="footer">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+							<img style="float:left;margin:0 15px 15px 5px;" src="/img/logo.svg" width="48px"/>
+							<h4> 闭社出品 closed.social </h4>
+							<p>隐私 安全 开源</p>
+
+						</div>
+						<div class="col-lg-3 col-sm-2 col-xs-3">
+							<h5> Contact / <small><a class="email" href="mailto:info@closed.social"> info@closed.social </a> </small></h5>
+
+							<h5> Code / <small><a class="web" href="//github.com/closed-social"> github.com/closed-social </a></small></h5>
+
+							<h5> Home / <small><a class="web" href="/">闭社</a></small> </h5>
+						</div>
+						<!--/.row-->
+					</div>
+					<!--/.container-->
+				</div>
+				<!--/.footer-->
+
+				<div>
+					<hr style="border-top: 1px solid white;"/>
+					<p style="font-size:75%;margin:0;text-align:center"> © 2020 Copyright: closed.social</p>
+				</div>
+			</div>
+			<!--/.footer-bottom-->
+
+		</footer>
+	</body>
+</html>
