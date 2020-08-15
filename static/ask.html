@@ -5,11 +5,16 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 		<link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap-grid.min.css" rel="stylesheet">
-		<script src="https://cdn.bootcss.com/js-sha256/0.9.0/sha256.min.js"></script>
 		<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+		<script src="https://cdn.bootcss.com/js-sha256/0.9.0/sha256.min.js"></script>
 		<script src="/js/notify.min.js"></script>
 		<title>匿名提问箱</title>
 		<style>
+		.popover-header {
+		    color:black;
+		 }
 @keyframes downn {
 	0% {
 		transform: translate(0px, 0px);
@@ -57,7 +62,11 @@
 			<hr style="border-top: 1px solid white;"/>
 
 			<div id="start" style="margin:30px auto;padding:15px;border: 1px dashed white;border-radius:15px; max-width:450px;">
-				<p>输入闭社id并私信 <b>@ask_me_bot</b> “新建”或“重置”，然后点击按钮，即可新建提问箱或重置提问箱链接。</p>
+				<p>输入闭社id并私信 <b>@ask_me_bot</b> “新建”，然后点击按钮，即可新建或重置提问箱链接。 
+				    <button type="button" class="btn btn-secondary btn-sm" data-toggle="popover" data-placement="bottom" title="提示" data-content="* 已建立过提问箱的情况下再次执行该步骤将重置链接，已有的提问不受影响。可通过重置后并不再分享新链接来实现关闭提问箱。 <br/><br/>
+				** 非清华站用户请使用完整用户名而非本地用户名，例如 @somebody@tha.closed.social。<br/><br/>
+				*** 高级用法：私信“新建[路径]”以指定加密路径，而非默认的随机路径。也可利用该功能恢复以前曾经用过的路径。限长度不超过16的小写字母串，示例：<br/>“@ask_me_bot 新建[hhhhhhh]”。" data-html="true">提示</button>
+				</p>
 				<form class="form-inline" action="javascript:void(0);" onsubmit="return sendData()">
 					<div class="input-group mb-2 mr-sm-2">
 						<div class="input-group-prepend">
@@ -67,11 +76,7 @@
 					</div>
 					<button id="send" type="submit" class="btn btn-primary mb-2">我已私信</button>
 				</form>
-				<p style="font-size:80%"> <br/>
-				* 可通过重置链接并不再分享新链接来实现关闭提问箱。 <br/>
-				** 非清华站用户请使用完整用户名而非本地用户名，例如 @somebody@tha.closed.social。<br/>
-				** 高级用法：私信“重置[路径]”以指定加密路径，而非默认的随机路径。限长度不超过32的小写字母，示例：<br/>“@ask_me_bot 重置[hhhhhhh]”。
-				</p>
+				
 			</div>
 
 			<hr/>
@@ -79,7 +84,12 @@
 		</div>
 
 		<script type="text/javascript">
+
+$(function () {
 $.notify.defaults({autoHideDelay: 1500});
+$('[data-toggle="popover"]').popover()
+})
+
 function test() {alert('test');}
 
 
@@ -95,6 +105,7 @@ function sendData() {
 		success:(result,status,xhr) => {
 			console.log(result+' : '+status);
 			$.notify("操作成功", "success");
+			location.pathname += result
 		},
 		error:(xhr,status,error) => {
 			$.notify(xhr.status+' : '+xhr.responseText, "error");
@@ -113,7 +124,7 @@ function sendData() {
 						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 							<img style="float:left;margin:0 15px 15px 5px;" src="/img/logo.svg" width="48px"/>
 							<h4> 闭社出品 closed.social </h4>
-							<p>隐私 安全 开源</p>
+							<p>隐私 安全 开源 分布式社交网络</p>
 
 						</div>
 						<div class="col-lg-3 col-sm-2 col-xs-3">
@@ -131,6 +142,7 @@ function sendData() {
 
 				<div>
 					<hr style="border-top: 1px solid white;"/>
+					<p style="font-size:75%;margin:0;text-align:center"> 灵感来自popi，特此致谢</p>
 					<p style="font-size:75%;margin:0;text-align:center"> © 2020 Copyright: closed.social</p>
 				</div>
 			</div>
