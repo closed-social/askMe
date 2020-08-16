@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template, send_from_directory, abort, redirect
 from flask_sqlalchemy import SQLAlchemy
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from mastodon import Mastodon
 import re, random, string, datetime
 import html2text
@@ -19,6 +21,11 @@ th = Mastodon(
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ask.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["50 / minute"],
+)
 
 h2t = html2text.HTML2Text()
 h2t.ignore_links = True
@@ -67,6 +74,7 @@ def root():
     return app.send_static_file('ask.html')
 
 @app.route('/askMe/inbox', methods=['POST'])
+@limiter.limit("10 / minute")
 def set_inbox():
     acct = request.form.get('username')
     if not re.match('[a-z0-9_]{1,30}(@[a-z\.-_]+)?', acct):
@@ -115,6 +123,7 @@ def inbox(acct, secr):
     return render_template('inbox.html', acct=u.acct, disp=u.disp, url=u.url, avat=u.avat, qs=Question.query.filter_by(acct=acct).all())
 
 @app.route('/askMe/<acct>/<secr>/new', methods=['POST'])
+@limiter.limit("50 / hour; 1 / 2 second")
 def new_question(acct, secr):
     if not User.query.filter_by(acct=acct, secr=secr).first():
         abort(404)
