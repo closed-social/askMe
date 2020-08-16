@@ -116,8 +116,7 @@ def inbox(acct, secr):
 
 @app.route('/askMe/<acct>/<secr>/new', methods=['POST'])
 def new_question(acct, secr):
-    u = User.query.filter_by(acct=acct, secr=secr).first()
-    if not u:
+    if not User.query.filter_by(acct=acct, secr=secr).first():
         abort(404)
 
     content = request.form.get('question')
@@ -126,7 +125,7 @@ def new_question(acct, secr):
         abort(422)
     
 
-    toot = th.status_post(f"@{acct} 叮~ 有新提问了 回复“删除”以永久删除该提问(第一次被点开时实际执行删除)，回复其他均视为回答该提问。可以回复多条，可以随时删除/重新编辑你的回复，可以@其他社友加入对话。\n\n{content}", visibility='direct')
+    toot = th.status_post(f"@{acct} 叮~ 有新提问 (戳我头像了解如何回复) 。\n\n{content}", visibility='direct')
     if not toot:
         abort(500)
     
@@ -137,6 +136,24 @@ def new_question(acct, secr):
     db.session.commit()
     
     return redirect(".")
+
+@app.route('/askMe/<acct>/<secr>/<int:toot>')
+def question_info(acct, secr, toot):
+    if not User.query.filter_by(acct=acct, secr=secr).first() or not Question.query.filter_by(acct=acct, toot=toot):
+        abort(404)
+
+    context = th.status_context(toot)
+    replies = [
+            {
+                'disp': t.account.display_name,
+                'url': t.account.url,
+                'content': h2t.handle(t.content).replace(BOT_NAME,'').strip(),
+                'time': str(t.created_at)
+                }
+            for t in context.descendants
+        ]
+    print(replies)
+    return {'replies': replies}
 
 if __name__ == '__main__':
     app.run(debug=True)
