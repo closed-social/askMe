@@ -74,7 +74,7 @@
                 </div>
                 <div class="collapse" id="collapse-{{q.toot}}">
                     <div class="card card-body">
-                        (暂无回复)
+                        加载中...
                     </div>
                 </div>
             </div>
@@ -97,7 +97,10 @@
 			                });
 			                console.log($(self).find('.timeago'));
 			                $(self).find('.timeago').timeago();
-			            } 
+			            }else {
+			                $(self).empty();
+			                $(self).append(`<div class="card card-body">(暂无回复)</div>`)
+			            }
 		            },
 		            error:(xhr,status,error) => {
 		                console.log(error, status, xhr.status, xhr.responseText);
