@@ -120,7 +120,7 @@ def inbox(acct, secr):
     if not u:
         abort(404)
     
-    return render_template('inbox.html', acct=u.acct, disp=u.disp, url=u.url, avat=u.avat, qs=Question.query.filter_by(acct=acct).all())
+    return render_template('inbox.html', acct=u.acct, disp=(u.disp or u.acct), url=u.url, avat=u.avat, qs=Question.query.filter_by(acct=acct).all())
 
 @app.route('/askMe/<acct>/<secr>/new', methods=['POST'])
 @limiter.limit("50 / hour; 1 / 2 second")
@@ -155,7 +155,7 @@ def question_info(acct, secr, toot):
     context = th.status_context(toot)
     replies = [
             {
-                'disp': t.account.display_name,
+                'disp': (t.account.display_name or t.account.acct),
                 'url': t.account.url,
                 'content': h2t.handle(t.content).replace(BOT_NAME,'').strip(),
                 'time': str(t.created_at)
