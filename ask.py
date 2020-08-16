@@ -77,7 +77,7 @@ def root():
 @limiter.limit("10 / minute")
 def set_inbox():
     acct = request.form.get('username')
-    if not re.match('[a-z0-9_]{1,30}(@[a-z\.-_]+)?', acct):
+    if not re.match('[A-Za-z0-9_]{1,30}(@[a-z\.-_]+)?', acct):
         return '无效的闭社id', 422
 
     r = th.conversations()
