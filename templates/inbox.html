@@ -100,7 +100,9 @@
 			            } 
 		            },
 		            error:(xhr,status,error) => {
-		                console.log(error+' : '+status);
+		                console.log(error, status, xhr.status, xhr.responseText);
+		                $(self).empty();
+		                $(self).append(`<div class="card card-body"><p style="color:red">${xhr.status} ${xhr.responseText}</p></div>`)
 		            }
 	            });
             });

@@ -129,7 +129,7 @@ def new_question(acct, secr):
     if not toot:
         abort(500)
     
-    print(toot.id)
+    #print(toot.id)
     
     q = Question(acct, content, toot.id)
     db.session.add(q)
@@ -139,7 +139,8 @@ def new_question(acct, secr):
 
 @app.route('/askMe/<acct>/<secr>/<int:toot>')
 def question_info(acct, secr, toot):
-    if not User.query.filter_by(acct=acct, secr=secr).first() or not Question.query.filter_by(acct=acct, toot=toot):
+    q = Question.query.filter_by(acct=acct, toot=toot).first()
+    if not q or not User.query.filter_by(acct=acct, secr=secr).first():
         abort(404)
 
     context = th.status_context(toot)
@@ -152,7 +153,13 @@ def question_info(acct, secr, toot):
                 }
             for t in context.descendants
         ]
-    print(replies)
+    #print(replies)
+    if replies and replies[-1].get('content') == '删除':
+        db.session.delete(q)
+        db.session.commit()
+        th.status_delete(toot)
+        return '该提问已被删除', 404
+
     return {'replies': replies}
 
 if __name__ == '__main__':
