@@ -5,7 +5,20 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 	<link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery-timeago/1.6.7/jquery.timeago.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery-timeago/1.6.7/locales/jquery.timeago.zh-CN.js"></script>
 	<title>欢迎向我提问！- {{disp}}的提问箱</title>
+	<style>
+	    .qbox {
+	        background:#e8e8e8;
+	        padding:5px;
+	        color:black;
+	        box-shadow: 2px 2px 10px 2px rgb(219 219 220);
+            border-radius: .5rem;
+            margin: 25px 0;
+	    }
+	</style>
 </head>
 <body style="background-color: #001a37;color:#e8e8e8">
 	
@@ -15,7 +28,7 @@
 				<div align='center' style='background-color:rgba(180,180,250,0.5);padding:10px;color:#ffffff;'>
 				    <div style="margin:20px">
 					    <span style='color:#555555;margin:0 10px;'> 闭社匿名提问箱</span>
-					    <a type="button" class="btn btn-primary btn-sm" href="/askMe">我也要创建</a>
+					    <a type="button" class="btn btn-dark btn-sm" href="/askMe">我也要创建</a>
 					</div>
 					<h1 align='center'><a href={{url}}>{{disp}}</a>的提问箱</h1>
 					<div style="text-align:left; margin-bottom:10px;height:30px" id="acct-info">
@@ -25,13 +38,41 @@
 				</div>
 			</div>
 			
-			<form>
-  <div class="form-group" style="background:#e8e8e8;padding:5px;color:black">
-    <label>向 {{disp}} 匿名提问</label>
-    <textarea class="form-control" id="question" rows="5" maxlength="500" placeholder="在此处写下你想问的"></textarea>
-    <button type="submit" class="btn btn-primary">发送提问</button>
-  </div>
-</form>
+			<form action="new" method="post">
+			    <div class="form-group qbox">
+                    <label>向 {{disp}} 匿名提问</label>
+                    <textarea class="form-control" id="question" name="question" rows="5" maxlength="400" placeholder="在此处写下你想问的" required="required"></textarea>
+                    <button type="submit" class="btn btn-primary">发送提问</button>
+                </div>
+            </form>
+            
+            <hr/>
+            <h3>对 {{disp}} 的提问({{qs|length}})</h3>
+            
+            {% for q in qs|reverse %}
+            <div class="qbox">
+                <pre>{{q.content}}</pre>
+                <div style="text-align:right">
+                    <time class="timeago" datetime="{{q.time}}">{{q.time}}</time>
+                    <a class="btn btn-link request-answer" data-toggle="collapse" href="#collapse-{{q.toot}}" role="button" aria-expanded="false" aria-controls="collapse-{{q.toot}}">
+                        查看回复
+                        <span><svg fill="#007bff" viewBox="0 0 24 24" width="24" height="24" ><path d="M12 13L8.285 9.218a.758.758 0 0 0-1.064 0 .738.738 0 0 0 0 1.052l4.249 4.512a.758.758 0 0 0 1.064 0l4.246-4.512a.738.738 0 0 0 0-1.052.757.757 0 0 0-1.063 0L12.002 13z" style="animation: downn 1.5s infinite;" "=""></path></svg></span>
+                    </a>
+                </div>
+                <div class="collapse" id="collapse-{{q.toot}}">
+                    <div class="card card-body">
+                        (暂无回复)
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <script>
+            $('.timeago').timeago();
+            $('.collapse').on('show.bs.collapse', (e) => {
+                console.log(e.target.id.split('-')[1]);
+            });
+            </script>
 
 	</div>
 </body>

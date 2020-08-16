@@ -63,9 +63,9 @@
 
 			<div id="start" style="margin:30px auto;padding:15px;border: 1px dashed white;border-radius:15px; max-width:450px;">
 				<p>输入闭社id并私信 <b>@ask_me_bot</b> “新建”，然后点击按钮，即可新建或重置提问箱链接。 
-				    <button type="button" class="btn btn-secondary btn-sm" data-toggle="popover" data-placement="bottom" title="提示" data-content="* 已建立过提问箱的情况下再次执行该步骤将重置链接，已有的提问不受影响。可通过重置后并不再分享新链接来实现关闭提问箱。 <br/><br/>
-				** 非清华站用户请使用完整用户名而非本地用户名，例如 @somebody@tha.closed.social。<br/><br/>
-				*** 高级用法：私信“新建[路径]”以指定加密路径，而非默认的随机路径。也可利用该功能恢复以前曾经用过的路径。限长度不超过16的小写字母串，示例：<br/>“@ask_me_bot 新建[hhhhhhh]”。" data-html="true">提示</button>
+				    <button type="button" class="btn btn-secondary btn-sm" data-toggle="popover" data-placement="left" title="提示" data-content="<img src='/img/pm.jpg' width=100%/> <p><br/>* 已建立过提问箱的情况下再次执行该步骤将重置链接，已有的提问不受影响。可通过重置后并不再分享新链接来实现关闭提问箱。 <br/><br/>
+				** 校友站用户请使用完整用户名而非本地用户名，例如 @somebody@tha.closed.social。<br/><br/>
+				*** 高级用法：私信“新建[路径]”以指定加密路径，而非默认的随机路径。也可利用该功能恢复以前曾经用过的路径。限长度不超过16的小写字母串，示例：<br/>“@ask_me_bot 新建[hhhhhhh]”。</p>" data-html="true">提示</button>
 				</p>
 				<form class="form-inline" action="javascript:void(0);" onsubmit="return sendData()">
 					<div class="input-group mb-2 mr-sm-2">
@@ -100,7 +100,7 @@ function sendData() {
 	};
 	$.ajax({
 		type:'POST',
-		url:'inbox/',
+		url:'inbox',
 		data:data, 
 		success:(result,status,xhr) => {
 			console.log(result+' : '+status);
@@ -125,6 +125,7 @@ function sendData() {
 							<img style="float:left;margin:0 15px 15px 5px;" src="/img/logo.svg" width="48px"/>
 							<h4> 闭社出品 closed.social </h4>
 							<p>隐私 安全 开源 分布式社交网络</p>
+							<p><b>重建清华校内封闭平台</b></p>
 
 						</div>
 						<div class="col-lg-3 col-sm-2 col-xs-3">
@@ -132,7 +133,7 @@ function sendData() {
 
 							<h5> Code / <small><a class="web" href="//github.com/closed-social"> github.com/closed-social </a></small></h5>
 
-							<h5> Home / <small><a class="web" href="/">闭社</a></small> </h5>
+							<h5> Home / <small><a class="web" href="//closed.social">闭社</a></small> </h5>
 						</div>
 						<!--/.row-->
 					</div>

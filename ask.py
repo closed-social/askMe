@@ -1,7 +1,7 @@
-from flask import Flask, request, render_template, send_from_directory, abort
+from flask import Flask, request, render_template, send_from_directory, abort, redirect
 from flask_sqlalchemy import SQLAlchemy
 from mastodon import Mastodon
-import re, random, string
+import re, random, string, datetime
 import html2text
 
 BOT_NAME = '@ask_me_bot'
@@ -37,7 +37,23 @@ class User(db.Model):
         self.acct = acct
 
     def __repr__(self):
-        return '@%s[%s]'%(self.acct, self.disp)
+        return f"@{self.acct}[{self.disp}]"
+
+class Question(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    acct = db.Column(db.String(64))
+    content = db.Column(db.String(400))
+    time = db.Column(db.DateTime)
+    toot = db.Column(db.BigInteger)
+    
+    def __init__(self, acct, content, toot):
+        self.acct = acct
+        self.content = content
+        self.toot = toot
+        self.time = datetime.datetime.now()
+
+    def __repr__(self):
+        return f"[{self.acct}]{self.content}({self.toot})"
 
 @app.route('/js/<path:path>')
 def send_js(path):
@@ -50,7 +66,7 @@ def send_img(path):
 def root():
     return app.send_static_file('ask.html')
 
-@app.route('/askMe/inbox/', methods=['POST'])
+@app.route('/askMe/inbox', methods=['POST'])
 def set_inbox():
     acct = request.form.get('username')
     if not re.match('[a-z0-9_]{1,30}(@[a-z\.-_]+)?', acct):
@@ -90,13 +106,37 @@ def set_inbox():
     
     return '未找到私信，请确认已发送且是最近发送', 404
 
-@app.route('/askMe/<acct>/<secr>')
+@app.route('/askMe/<acct>/<secr>/')
 def inbox(acct, secr):
     u = User.query.filter_by(acct=acct, secr=secr).first()
     if not u:
         abort(404)
     
-    return render_template('inbox.html', acct=u.acct, disp=u.disp, url=u.url, avat=u.avat)
+    return render_template('inbox.html', acct=u.acct, disp=u.disp, url=u.url, avat=u.avat, qs=Question.query.filter_by(acct=acct).all())
+
+@app.route('/askMe/<acct>/<secr>/new', methods=['POST'])
+def new_question(acct, secr):
+    u = User.query.filter_by(acct=acct, secr=secr).first()
+    if not u:
+        abort(404)
+
+    content = request.form.get('question')
+    print(content)
+    if not content or len(content)>400:
+        abort(422)
+    
+
+    toot = th.status_post(f"@{acct} 叮~ 有新提问了 回复“删除”以永久删除该提问(第一次被点开时实际执行删除)，回复其他均视为回答该提问。可以回复多条，可以随时删除/重新编辑你的回复，可以@其他社友加入对话。\n\n{content}", visibility='direct')
+    if not toot:
+        abort(500)
+    
+    print(toot.id)
+    
+    q = Question(acct, content, toot.id)
+    db.session.add(q)
+    db.session.commit()
+    
+    return redirect(".")
 
 if __name__ == '__main__':
     app.run(debug=True)
