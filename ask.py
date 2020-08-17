@@ -21,6 +21,8 @@ th = Mastodon(
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ask.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JSON_AS_ASCII'] = False
+
 limiter = Limiter(
     app,
     key_func=get_remote_address,
