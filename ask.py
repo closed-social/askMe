@@ -73,6 +73,10 @@ def send_img(path):
 def root():
     return app.send_static_file('ask.html')
 
+@app.route('/askMe/footer.html')
+def root_footer():
+    return app.send_static_file('footer.html')
+
 @app.route('/askMe/inbox', methods=['POST'])
 @limiter.limit("10 / minute")
 def set_inbox():
