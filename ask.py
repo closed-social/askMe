@@ -7,11 +7,17 @@ import re, random, string, datetime
 import html2text
 
 BOT_NAME = '@ask_me_bot'
+CLIENT_ID = 'WQHzKKvfahkkcFm_iErT6ZdYvczi8L6Uunsoa88bCKA'
+CLIENT_SEC = open('client.secret', 'r').read().strip()
+
 DOMAIN   = 'thu.closed.social'
 
 WORK_URL = 'https://closed.social'
+#WORK_URL = 'http://127.0.0.1:5000'
 
-token = open('token.secret','r').read().strip('\n')
+REDIRECT_URI = WORK_URL + '/askMe/auth'
+
+token = open('token.secret','r').read().strip()
 th = Mastodon(
     access_token = token,
     api_base_url = 'https://' + DOMAIN
@@ -78,6 +84,37 @@ def root():
 @app.route('/askMe/footer.html')
 def root_footer():
     return app.send_static_file('footer.html')
+
+
+@app.route('/askMe/auth')
+@limiter.limit("10 / minute")
+def set_inbox_auth():
+    code = request.args.get('code')
+
+    client = Mastodon(
+            client_id = CLIENT_ID,
+            client_secret = CLIENT_SEC,
+            api_base_url = 'https://' + DOMAIN
+            )
+    token = client.log_in(code=code, redirect_uri=REDIRECT_URI, scopes=['read', 'write'])
+
+    info = client.account_verify_credentials()
+
+    acct = info.acct
+    u = User.query.filter_by(acct=acct).first()
+    if not u:
+        u = User(acct)
+        u.secr = ''.join(random.choice(string.ascii_lowercase) for i in range(16))
+        db.session.add(u)
+    
+    u.disp = info.display_name
+    u.url  = info.url
+    u.avat = info.avatar
+    db.session.commit()
+
+    client.status_post(f"[自动发送] 我创建了一个匿名提问箱，欢迎提问~\n{WORK_URL}/askMe/{acct}/{u.secr}", visibility='public')
+    
+    return redirect(f"/askMe/{acct}/{u.secr}")
 
 @app.route('/askMe/inbox', methods=['POST'])
 @limiter.limit("10 / minute")

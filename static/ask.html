@@ -71,7 +71,9 @@
 
 			<hr style="border-top: 1px solid white;"/>
 
-			<div id="start" style="margin:30px auto;padding:15px;border: 1px dashed white;border-radius:15px; max-width:400px;">
+            <h4 id="start">选择任意一种方式创建提问箱</h4>
+			<div style="margin:30px auto;padding:15px;border: 1px dashed white;border-radius:15px; max-width:400px;">
+			    <h5>私信bot认证</h5>
 				<p>输入闭社id并前往闭社私信 <b>@ask_me_bot</b> “新建”，然后点击下方按钮，即可新建或重置提问箱。 
 				    <a href="##" role="button"data-toggle="popover" >
 				    <svg width="20px" viewBox="0 0 24 28"><path d="M15.07 11.25l-.9.92C13.45 12.89 13 13.5 13 15h-2v-.5c0-1.11.45-2.11 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41a2 2 0 0 0-2-2a2 2 0 0 0-2 2H8a4 4 0 0 1 4-4a4 4 0 0 1 4 4a3.2 3.2 0 0 1-.93 2.25M13 19h-2v-2h2M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10c0-5.53-4.5-10-10-10z" fill="#626262"/></svg>
@@ -91,6 +93,19 @@
 					</div>
 				</form>
 				
+			</div>
+			
+			<div style="margin:30px auto;padding:15px;border: 1px dashed white;border-radius:15px; max-width:400px;">
+			    <h5>授权登陆认证</h5>
+			    <p>不会重置已有的链接 自动发布一条公开嘟文</p>
+			    <a id="auth" href="##" target="_blank" class="btn btn-primary mb-2">授权登陆</a>
+			    <script>
+			    var c_id = "WQHzKKvfahkkcFm_iErT6ZdYvczi8L6Uunsoa88bCKA";
+			    var hostname = "thu.closed.social";
+			    $('#auth').click(function() {
+			        $(this).attr("href", `https://${hostname}/oauth/authorize?client_id=${c_id}&scope=read+write&&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'auth')}&response_type=code`);
+			    });
+            </script>
 			</div>
 
 			<hr/>
