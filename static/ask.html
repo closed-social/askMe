@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<meta charset='UTF-8'>
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<link rel="icon" type="image/png" href="/img/box.png"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 		<link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap-grid.min.css" rel="stylesheet">
 		<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
@@ -98,13 +98,50 @@
 			
 			<div style="margin:30px auto;padding:15px;border: 1px dashed white;border-radius:15px; max-width:400px;">
 			    <h5>授权登陆认证</h5>
-			    <p>不会重置已有的链接 自动发布一条公开嘟文</p>
-			    <a id="auth" href="##" target="_blank" class="btn btn-primary mb-2">授权登陆</a>
+			    <p>授权<b>匿名提问箱</b>访问你的闭社账户，需要读权限(获取账户信息)和写权限(如果勾选了自动发布)。</p>
+				<p>
+				<a id="auth" href="##" class="btn btn-primary mb-2">授权登陆</a>
+
+				<a class="btn btn-link" data-toggle="collapse" href="#advantageSettings" role="button">
+					#高级设置
+				</a>
+				</p>
+
+				<div class="collapse" id="advantageSettings" style="background-color:rgba(255,255,255,0.1);padding:10px">
+
+					<form>
+						<div class="form-group row">
+							<label class="col-sm-3 col-form-label">加密路径</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="secr" placeholder="留空则保持不变/随机生成" pattern="[a-z]{0,16}">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" id="autoSend" checked>
+								<label class="form-check-label" for="autoSend">
+									自动发布
+								</label>
+							</div>
+						</div>
+					</form>
+				</div>
+				
 			    <script>
 			    var c_id = "WQHzKKvfahkkcFm_iErT6ZdYvczi8L6Uunsoa88bCKA";
 			    var hostname = "thu.closed.social";
+			    function checked() {
+			        return $('#autoSend:checked').length>0;
+			    }
+			    
 			    $('#auth').click(function() {
-			        $(this).attr("href", `https://${hostname}/oauth/authorize?client_id=${c_id}&scope=read+write&&redirect_uri=${encodeURIComponent(location.origin+location.pathname+'auth')}&response_type=code`);
+			        if(!$('#secr').val().match(/^[a-z]{0,16}$/)) {
+			            $.notify("加密路径格式不正确，限长度不超过16的小写字母串", "error");
+			        } else {
+			            var re_uri=`${location.origin}${location.pathname}auth?autoSend=${checked()? 'autoSend':''}&secr=${$('#secr').val()}`;
+			            console.log(re_uri);
+			            $(this).attr("href", `https://${hostname}/oauth/authorize?client_id=${c_id}&scope=read${checked()?'+write':''}&redirect_uri=${encodeURIComponent(re_uri)}&response_type=code`);
+			        }
 			    });
             </script>
 			</div>

@@ -90,13 +90,20 @@ def root_footer():
 @limiter.limit("10 / minute")
 def set_inbox_auth():
     code = request.args.get('code')
+    autoSend = request.args.get('autoSend')
+    secr = request.args.get('secr')
+
+    #print(code,autoSend, secr)
+    
+    if secr and not re.match('[a-z]{0,16}', secr):
+        abort(422)
 
     client = Mastodon(
             client_id = CLIENT_ID,
             client_secret = CLIENT_SEC,
             api_base_url = 'https://' + DOMAIN
             )
-    token = client.log_in(code=code, redirect_uri=REDIRECT_URI, scopes=['read', 'write'])
+    token = client.log_in(code=code, redirect_uri=f"{REDIRECT_URI}?autoSend={autoSend or ''}&secr={secr or ''}", scopes=['read', 'write'] if autoSend else ['read'])
 
     info = client.account_verify_credentials()
 
@@ -104,15 +111,18 @@ def set_inbox_auth():
     u = User.query.filter_by(acct=acct).first()
     if not u:
         u = User(acct)
-        u.secr = ''.join(random.choice(string.ascii_lowercase) for i in range(16))
         db.session.add(u)
+    
+    u.secr = secr or u.secr or ''.join(random.choice(string.ascii_lowercase) for i in range(16))
     
     u.disp = info.display_name
     u.url  = info.url
     u.avat = info.avatar
+    
+    if autoSend:
+        client.status_post(f"[自动发送] 我创建了一个匿名提问箱，欢迎提问~\n{WORK_URL}/askMe/{acct}/{u.secr}", visibility='public')
+    
     db.session.commit()
-
-    client.status_post(f"[自动发送] 我创建了一个匿名提问箱，欢迎提问~\n{WORK_URL}/askMe/{acct}/{u.secr}", visibility='public')
     
     return redirect(f"/askMe/{acct}/{u.secr}")
 
