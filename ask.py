@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, send_from_directory, abort, r
 from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_migrate import Migrate
 from mastodon import Mastodon
 import re, random, string, datetime
 import html2text
@@ -39,6 +40,7 @@ h2t = html2text.HTML2Text()
 h2t.ignore_links = True
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,6 +49,7 @@ class User(db.Model):
     avat = db.Column(db.String(256))
     url  = db.Column(db.String(128))
     secr = db.Column(db.String(16))
+    root = db.Column(db.BigInteger)
 
     def __init__(self, acct):
         self.acct = acct
@@ -178,18 +181,23 @@ def inbox(acct, secr):
 @app.route('/askMe/<acct>/<secr>/new', methods=['POST'])
 @limiter.limit("50 / hour; 1 / 2 second")
 def new_question(acct, secr):
-    if not User.query.filter_by(acct=acct, secr=secr).first():
+    u = User.query.filter_by(acct=acct, secr=secr).first()
+    if not u:
         abort(404)
 
     content = request.form.get('question')
     print(content)
     if not content or len(content)>400:
         abort(422)
-    
-
-    toot = th.status_post(f"@{acct} 叮~ 有新提问 (戳我头像了解如何回复) 。\n\n{content}", visibility='direct')
-    if not toot:
-        abort(500)
+   
+    if not u.root:
+        toot = th.status_post(f"@{acct} 欢迎使用匿名提问箱。未来的新提问会集中显示在这里，方便管理。戳我头像了解如何回复。", visibility='direct')
+        u.root = toot.id
+        
+    toot = th.status_post(f"@{acct} 叮~ 有新提问：\n\n{content}",
+            in_reply_to_id=u.root,
+            visibility='direct'
+            )
     
     #print(toot.id)
     
