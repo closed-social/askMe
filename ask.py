@@ -5,6 +5,7 @@ from flask_limiter.util import get_remote_address
 from flask_migrate import Migrate
 from mastodon import Mastodon
 import re, random, string, datetime
+from dateutil.tz import tzlocal
 import html2text
 
 BOT_NAME = '@ask_me_bot'
@@ -176,7 +177,14 @@ def inbox(acct, secr):
     if not u:
         abort(404)
     
-    return render_template('inbox.html', acct=u.acct, disp=(u.disp or u.acct), url=u.url, avat=u.avat, qs=Question.query.filter_by(acct=acct).all())
+    qs = [{
+            'content': q.content,
+            'toot': q.toot,
+            'time': q.time.replace(tzinfo=tzlocal())
+            } for q in Question.query.filter_by(acct=acct).all()
+        ]
+
+    return render_template('inbox.html', acct=u.acct, disp=(u.disp or u.acct), url=u.url, avat=u.avat, qs=qs)
 
 @app.route('/askMe/<acct>/<secr>/new', methods=['POST'])
 @limiter.limit("50 / hour; 1 / 2 second")
