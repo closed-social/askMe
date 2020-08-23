@@ -197,22 +197,22 @@ def new_question(acct, secr):
     print(content)
     if not content or len(content)>400:
         abort(422)
-   
-    if not u.root:
-        toot = th.status_post(f"@{acct} 欢迎使用匿名提问箱。未来的新提问会集中显示在这里，方便管理。戳我头像了解如何回复。", visibility='direct')
-        u.root = toot.id
+
+    if not Question.query.filter_by(acct=acct, content=content).first():
         
-    toot = th.status_post(f"@{acct} 叮~ 有新提问：\n\n{content}",
-            in_reply_to_id=u.root,
-            visibility='direct'
-            )
-    
-    #print(toot.id)
-    
-    q = Question(acct, content, toot.id)
-    db.session.add(q)
-    db.session.commit()
-    
+        if not u.root:
+            toot = th.status_post(f"@{acct} 欢迎使用匿名提问箱。未来的新提问会集中显示在这里，方便管理。戳我头像了解如何回复。", visibility='direct')
+            u.root = toot.id
+
+        toot = th.status_post(f"@{acct} 叮~ 有新提问：\n\n{content}",
+                in_reply_to_id=u.root,
+                visibility='direct'
+                )
+
+        q = Question(acct, content, toot.id)
+        db.session.add(q)
+        db.session.commit()
+
     return redirect(".")
 
 @app.route('/askMe/<acct>/<secr>/<int:toot>')
