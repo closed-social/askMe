@@ -128,7 +128,7 @@
 				</div>
 				
 			    <script>
-			    var c_id = "WQHzKKvfahkkcFm_iErT6ZdYvczi8L6Uunsoa88bCKA";
+			    var c_id = "tKqbqe-KfV6n2HUnSyjnBbsuzGCgshW5ICu-YTIoeSU";
 			    var hostname = "thu.closed.social";
 			    function checked() {
 			        return $('#autoSend:checked').length>0;
@@ -140,7 +140,7 @@
 			        } else {
 			            var re_uri=`${location.origin}${location.pathname}auth?autoSend=${checked()? 'autoSend':''}&secr=${$('#secr').val()}`;
 			            console.log(re_uri);
-			            $(this).attr("href", `https://${hostname}/oauth/authorize?client_id=${c_id}&scope=read${checked()?'+write':''}&redirect_uri=${encodeURIComponent(re_uri)}&response_type=code`);
+			            $(this).attr("href", `https://${hostname}/oauth/authorize?client_id=${c_id}&scope=read:accounts${checked()?'+write:statuses':''}&redirect_uri=${encodeURIComponent(re_uri)}&response_type=code`);
 			        }
 			    });
             </script>

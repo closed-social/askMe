@@ -9,7 +9,7 @@ from dateutil.tz import tzlocal
 import html2text
 
 BOT_NAME = '@ask_me_bot'
-CLIENT_ID = 'WQHzKKvfahkkcFm_iErT6ZdYvczi8L6Uunsoa88bCKA'
+CLIENT_ID = 'tKqbqe-KfV6n2HUnSyjnBbsuzGCgshW5ICu-YTIoeSU'
 CLIENT_SEC = open('client.secret', 'r').read().strip()
 
 DOMAIN   = 'thu.closed.social'
@@ -107,7 +107,7 @@ def set_inbox_auth():
             client_secret = CLIENT_SEC,
             api_base_url = 'https://' + DOMAIN
             )
-    token = client.log_in(code=code, redirect_uri=f"{REDIRECT_URI}?autoSend={autoSend or ''}&secr={secr or ''}", scopes=['read', 'write'] if autoSend else ['read'])
+    token = client.log_in(code=code, redirect_uri=f"{REDIRECT_URI}?autoSend={autoSend or ''}&secr={secr or ''}", scopes=['read:accounts', 'write:statuses'] if autoSend else ['read:accounts'])
 
     info = client.account_verify_credentials()
 
